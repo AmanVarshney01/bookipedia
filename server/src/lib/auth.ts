@@ -10,4 +10,10 @@ export const auth = betterAuth({
   }),
   trustedOrigins: [process.env.CLIENT_URL!],
   emailAndPassword: { enabled: true },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
 });

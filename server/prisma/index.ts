@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-let prisma = new PrismaClient({
-  log: ["info", "warn", "error"],
-});
+let prisma = new PrismaClient();
 
 export default prisma;

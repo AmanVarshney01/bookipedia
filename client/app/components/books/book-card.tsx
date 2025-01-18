@@ -27,7 +27,7 @@ export default function BookCard({
           </div>
           <div className="flex items-center gap-1.5">
             <IndianRupee className="h-4 w-4" />
-            <span>${book.price.toFixed(2)}</span>
+            <span>{book.price.toFixed(2)}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4" />

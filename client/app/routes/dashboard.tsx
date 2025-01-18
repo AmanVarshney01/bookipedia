@@ -8,7 +8,7 @@ export default function Dashboard() {
       <header className="flex flex-row items-center justify-between p-4">
         <div className="flex flex-row gap-2">
           <Book />
-          <h1>BookMate</h1>
+          <h1>Bookipedia</h1>
         </div>
         <UserMenu />
       </header>

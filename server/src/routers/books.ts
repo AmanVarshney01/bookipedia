@@ -4,14 +4,24 @@ import prisma from "../../prisma";
 import { protectedProcedure, router } from "../lib/trpc";
 
 const bookSchema = z.object({
-  title: z.string().min(1),
-  author: z.string().min(1),
-  description: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  author: z.string().min(1, "Author is required"),
+  description: z.string().nullable().optional(),
+  price: z.number().min(1, "Price must be at least 1"),
+  publishedAt: z.string().transform((date) => new Date(date)),
 });
 
 export const booksRouter = router({
   getAll: protectedProcedure.query(({ ctx }) => {
     return prisma.book.findMany({
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        description: true,
+        price: true,
+        publishedAt: true,
+      },
       where: {
         userId: ctx.session.user.id,
       },

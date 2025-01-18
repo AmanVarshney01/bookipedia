@@ -75,10 +75,12 @@ model Verification {
 }
 
 model Book {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @map("_id")
   title       String
   author      String
   description String?
+  price       Float    @default(0)
+  publishedAt DateTime
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())

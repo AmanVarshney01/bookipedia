@@ -1,10 +1,3 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Loader2, PlusCircle } from "lucide-react";
-import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,13 +16,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { bookSchema } from "@/lib/schemas";
 import { trpc } from "@/utils/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  author: z.string().min(1, "Author is required"),
-  description: z.string().optional(),
-});
+const formSchema = bookSchema.omit({ id: true });
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -56,11 +52,19 @@ export function CreateBookDialog() {
       title: "",
       author: "",
       description: "",
+      price: 0,
+      publishedAt: "",
     },
   });
 
   function onSubmit(values: FormValues) {
-    createBook.mutate(values);
+    createBook.mutate({
+      title: values.title,
+      author: values.author,
+      description: values.description,
+      price: Number(values.price),
+      publishedAt: new Date(values.publishedAt).toISOString(),
+    });
   }
 
   return (
@@ -110,7 +114,42 @@ export function CreateBookDialog() {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="publishedAt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Published Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      {...field}
+                      max={new Date().toISOString().split("T")[0]}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

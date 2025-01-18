@@ -6,6 +6,14 @@ import {
 } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import {
+  AlertTriangleIcon,
+  CheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  XIcon,
+} from "lucide-react";
+import { NuqsAdapter } from "nuqs/adapters/react-router/v7";
+import {
   isRouteErrorResponse,
   Links,
   Meta,
@@ -16,6 +24,7 @@ import {
 import { toast } from "sonner";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { ThemeProvider } from "./components/theme-provider";
 import { trpc } from "./utils/trpc";
 
 export const links: Route.LinksFunction = () => [
@@ -43,7 +52,41 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <Toaster richColors />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            unstyled: true,
+            classNames: {
+              toast:
+                "bg-background items-center w-full border border-border rounded-lg shadow-lg p-4 flex gap-3",
+              title: "text-foreground font-medium",
+              description: "text-muted-foreground text-sm",
+              actionButton:
+                "bg-primary text-primary-foreground px-3 py-2 text-sm rounded-md hover:opacity-90 transition-opacity",
+              cancelButton:
+                "bg-muted text-muted-foreground px-3 py-2 text-sm rounded-md hover:opacity-90 transition-opacity",
+              closeButton:
+                "text-muted-foreground hover:text-foreground transition-colors",
+              success: "border-l-4 border-l-[hsl(var(--gold-leaf))]",
+              error: "border-l-4 border-l-[hsl(var(--burgundy))]",
+              warning: "border-l-4 border-l-[hsl(var(--leather))]",
+              info: "border-l-4 border-l-[hsl(var(--ink))]",
+            },
+          }}
+          icons={{
+            success: (
+              <CheckIcon className="h-5 w-5 text-[hsl(var(--gold-leaf))]" />
+            ),
+            error: <XIcon className="h-5 w-5 text-[hsl(var(--burgundy))]" />,
+            warning: (
+              <AlertTriangleIcon className="h-5 w-5 text-[hsl(var(--leather))]" />
+            ),
+            info: <InfoIcon className="h-5 w-5 text-[hsl(var(--ink))]" />,
+            loading: (
+              <Loader2Icon className="h-5 w-5 animate-spin text-[hsl(var(--ink))]" />
+            ),
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -84,7 +127,11 @@ export default function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <Outlet />
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <NuqsAdapter>
+            <Outlet />
+          </NuqsAdapter>
+        </ThemeProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

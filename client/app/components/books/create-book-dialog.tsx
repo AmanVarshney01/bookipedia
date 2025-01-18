@@ -104,19 +104,39 @@ export function CreateBookDialog() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex flex-row items-center justify-between gap-4">
+              <FormField
+                control={form.control}
+                name="author"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Author</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="description"
@@ -125,24 +145,6 @@ export function CreateBookDialog() {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea {...field} value={field.value || ""} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="1"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      value={field.value}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

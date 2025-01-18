@@ -9,12 +9,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { useEffect } from "react";
 
 export default function UserMenu() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    if (!session && !isPending) {
+      navigate("/");
+    }
+  }, [session, isPending]);
 
   if (isPending) {
     return <Skeleton className="h-9 w-24" />;
@@ -23,15 +29,20 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={"outline"}>{session?.user.name}</Button>
+        <Button
+          variant="outline"
+          className="border-primary-foreground/20 text-primary"
+        >
+          {session?.user.name}
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="bg-card">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>{session?.user.email}</DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Button
-            variant={"destructive"}
+            variant="destructive"
             className="w-full"
             onClick={() => {
               authClient.signOut({

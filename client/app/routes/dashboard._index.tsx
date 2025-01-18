@@ -8,20 +8,19 @@ export default function DashboardIndex() {
   const { data: books, isLoading } = trpc.books.getAll.useQuery();
 
   return (
-    <div className="flex flex-col gap-4 p-2">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Books</h1>
+    <div className="rounded-lg bg-card p-6 shadow-lg">
+      <div className="mb-6 flex items-center justify-between border-b-2 border-primary/20 pb-4">
+        <h1 className="font-serif text-3xl font-bold text-primary">
+          My Library
+        </h1>
         <CreateBookDialog />
       </div>
-
       {isLoading ? (
-        <div className="flex flex-col space-y-3">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-        </div>
+        <Skeleton className="h-44 w-full" />
       ) : (
-        <BooksDataTable columns={columns} data={books || []} />
+        <div className="rounded-md">
+          <BooksDataTable columns={columns} data={books || []} />
+        </div>
       )}
     </div>
   );

@@ -86,8 +86,8 @@ export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="flex w-full justify-start">
-          <Pencil className="mr-2 h-4 w-4" />
+        <Button variant="outline" className="flex w-full">
+          <Pencil className="h-4 w-4" />
           Edit
         </Button>
       </DialogTrigger>
@@ -110,19 +110,39 @@ export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex flex-row items-center justify-between gap-4">
+              <FormField
+                control={form.control}
+                name="author"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Author</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="description"
@@ -131,24 +151,6 @@ export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea {...field} value={field.value || ""} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="1"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      value={field.value}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

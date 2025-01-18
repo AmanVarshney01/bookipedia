@@ -18,12 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { useQueryState, parseAsBoolean } from "nuqs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { bookSchema } from "@/lib/schemas";
 import { z } from "zod";
-import { LayoutGrid, List } from "lucide-react"; // Import icons
+import { LayoutGrid, List } from "lucide-react";
 import BookCard from "./book-card";
 
 interface DataTableProps {
@@ -36,7 +36,10 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [isGridView, setIsGridView] = React.useState(false);
+  const [isGridView, setIsGridView] = useQueryState(
+    "isGridView",
+    parseAsBoolean.withDefault(false),
+  );
 
   const table = useReactTable({
     data,
@@ -55,8 +58,8 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
   const filteredData = table.getRowModel().rows.map((row) => row.original);
 
   return (
-    <div>
-      <div className="flex items-center justify-between py-4">
+    <div className="flex flex-col gap-4 p-2">
+      <div className="flex items-center justify-between">
         <Input
           placeholder="Filter by title..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}

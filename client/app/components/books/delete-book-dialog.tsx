@@ -48,6 +48,7 @@ export function DeleteBookDialog({
       <DialogTrigger asChild>
         <Button variant="destructive" className="w-full">
           <Trash2 className="h-4 w-4" />
+          <span>Delete</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

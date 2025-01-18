@@ -1,4 +1,14 @@
-import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { bookSchema } from "@/lib/schemas";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -9,21 +19,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useQueryState, parseAsBoolean } from "nuqs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { bookSchema } from "@/lib/schemas";
-import { z } from "zod";
 import { LayoutGrid, List } from "lucide-react";
+import { parseAsJson, parseAsStringEnum, useQueryState } from "nuqs";
+import { z } from "zod";
 import BookCard from "./book-card";
 
 interface DataTableProps {
@@ -32,22 +30,46 @@ interface DataTableProps {
 }
 
 export function BooksDataTable({ columns, data }: DataTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+  const [sorting, setSorting] = useQueryState<SortingState>(
+    "sort",
+    parseAsJson((value: unknown): SortingState => {
+      if (Array.isArray(value)) {
+        return value as SortingState;
+      }
+      return [];
+    }).withDefault([]),
   );
+
+  const [columnFilters, setColumnFilters] = useQueryState<ColumnFiltersState>(
+    "filters",
+    parseAsJson((value: unknown): ColumnFiltersState => {
+      if (Array.isArray(value)) {
+        return value as ColumnFiltersState;
+      }
+      return [];
+    }).withDefault([]),
+  );
+
   const [isGridView, setIsGridView] = useQueryState(
-    "isGridView",
-    parseAsBoolean.withDefault(false),
+    "view",
+    parseAsStringEnum(["grid", "list"]).withDefault("list"),
   );
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: async (updater) => {
+      const newValue =
+        typeof updater === "function" ? updater(sorting) : updater;
+      await setSorting(newValue);
+    },
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: async (updater) => {
+      const newValue =
+        typeof updater === "function" ? updater(columnFilters) : updater;
+      await setColumnFilters(newValue);
+    },
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
@@ -56,6 +78,10 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
   });
 
   const filteredData = table.getRowModel().rows.map((row) => row.original);
+
+  const toggleView = async () => {
+    await setIsGridView(isGridView === "grid" ? "list" : "grid");
+  };
 
   return (
     <div className="flex flex-col gap-4 p-2">
@@ -70,23 +96,23 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
         />
         <div className="space-x-2">
           <Button
-            variant={isGridView ? "outline" : "default"}
+            variant={isGridView === "list" ? "default" : "outline"}
             size="icon"
-            onClick={() => setIsGridView(false)}
+            onClick={() => toggleView()}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button
-            variant={isGridView ? "default" : "outline"}
+            variant={isGridView === "grid" ? "default" : "outline"}
             size="icon"
-            onClick={() => setIsGridView(true)}
+            onClick={() => toggleView()}
           >
             <LayoutGrid className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {isGridView ? (
+      {isGridView === "grid" ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredData.length > 0 ? (
             filteredData.map((book, index) => (

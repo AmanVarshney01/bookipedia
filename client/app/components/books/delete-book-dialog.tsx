@@ -21,21 +21,26 @@ export function DeleteBookDialog({
 }) {
   const [open, setOpen] = useState(false);
 
-  const { refetch } = trpc.books.getAll.useQuery();
+  const utils = trpc.useUtils();
 
   const deleteBook = trpc.books.delete.useMutation({
     onSuccess: () => {
-      refetch();
-      setOpen(false);
-      toast.success("Book deleted successfully!");
-    },
-    onError: (error) => {
-      toast.error("Failed to delete book: " + error.message);
+      utils.books.getAll.invalidate();
     },
   });
 
   const handleDelete = () => {
-    deleteBook.mutate(bookId);
+    toast.promise(
+      async () => {
+        await deleteBook.mutateAsync(bookId);
+      },
+      {
+        loading: "Deleting book...",
+        success: "Book deleted successfully",
+        error: "Failed to delete book",
+      },
+    );
+    setOpen(false);
   };
 
   return (

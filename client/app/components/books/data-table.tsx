@@ -84,7 +84,6 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
       </div>
 
       {isGridView ? (
-        // Card View
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredData.length > 0 ? (
             filteredData.map((book, index) => (
@@ -95,14 +94,13 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
           )}
         </div>
       ) : (
-        // Table View
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-center">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -122,7 +120,7 @@ export function BooksDataTable({ columns, data }: DataTableProps) {
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell key={cell.id} className="text-center">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),

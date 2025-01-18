@@ -4,6 +4,7 @@ import { ArrowUpDown } from "lucide-react";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import BookDropdownMenu from "./book-dropdown-menu";
+import { format } from "date-fns";
 
 export const columns: ColumnDef<z.infer<typeof bookSchema>>[] = [
   {
@@ -63,7 +64,7 @@ export const columns: ColumnDef<z.infer<typeof bookSchema>>[] = [
     },
     cell: ({ row }) => {
       const book = row.original;
-      return new Date(book.publishedAt).toDateString();
+      return format(new Date(book.publishedAt), "PPP");
     },
   },
   {

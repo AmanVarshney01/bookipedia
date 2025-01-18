@@ -12,7 +12,7 @@ export default function Dashboard() {
         </div>
         <UserMenu />
       </header>
-      <div className="size-full p-4">
+      <div className="p-2">
         <Outlet />
       </div>
     </div>

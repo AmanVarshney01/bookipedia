@@ -75,7 +75,7 @@ model Verification {
 }
 
 model Book {
-  id          String   @id @map("_id")
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   author      String
   description String?

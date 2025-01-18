@@ -3,6 +3,7 @@ import type { bookSchema } from "@/lib/schemas";
 import { BookOpen, Calendar, IndianRupee, User } from "lucide-react";
 import type { z } from "zod";
 import BookDropdownMenu from "./book-dropdown-menu";
+import { format } from "date-fns";
 
 export default function BookCard({
   book,
@@ -30,7 +31,7 @@ export default function BookCard({
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4" />
-            <span>{new Date(book.publishedAt).toDateString()}</span>
+            <span>{format(new Date(book.publishedAt), "PPP")}</span>
           </div>
         </div>
         {/* {book.description && (

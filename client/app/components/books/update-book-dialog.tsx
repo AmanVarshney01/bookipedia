@@ -17,13 +17,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { bookSchema } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Pencil } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, Loader2, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const formSchema = bookSchema.omit({ id: true });
 
@@ -36,16 +40,11 @@ interface UpdateBookDialogProps {
 export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const { refetch } = trpc.books.getAll.useQuery();
+  const utils = trpc.useUtils();
 
   const updateBook = trpc.books.update.useMutation({
     onSuccess: () => {
-      refetch();
-      setOpen(false);
-      toast.success("Book updated successfully!");
-    },
-    onError: (error) => {
-      toast.error("Failed to update book: " + error.message);
+      utils.books.getAll.invalidate();
     },
   });
 
@@ -61,16 +60,27 @@ export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
   });
 
   function onSubmit(values: FormValues) {
-    updateBook.mutate({
-      id: book.id,
-      data: {
-        title: values.title,
-        author: values.author,
-        description: values.description,
-        price: Number(values.price),
-        publishedAt: new Date(values.publishedAt).toISOString(),
+    toast.promise(
+      async () => {
+        await updateBook.mutateAsync({
+          id: book.id,
+          data: {
+            title: values.title,
+            author: values.author,
+            description: values.description,
+            price: Number(values.price),
+            publishedAt: new Date(values.publishedAt).toISOString(),
+          },
+        });
       },
-    });
+      {
+        loading: "Updating book...",
+        success: "Book updated successfully",
+        error: "Failed to update book",
+      },
+    );
+
+    setOpen(false);
   }
 
   return (
@@ -148,15 +158,45 @@ export function UpdateBookDialog({ book }: UpdateBookDialogProps) {
               control={form.control}
               name="publishedAt"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Published Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      max={new Date().toISOString().split("T")[0]}
-                    />
-                  </FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(new Date(field.value), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => {
+                          field.onChange(
+                            date ? date.toISOString().split("T")[0] : "",
+                          );
+                        }}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

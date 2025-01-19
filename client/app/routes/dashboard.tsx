@@ -1,6 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import UserMenu from "@/components/user-menu";
-import { authClient } from "@/lib/auth-client";
 import { Book } from "lucide-react";
 import { Link, Outlet } from "react-router";
 
